@@ -9,6 +9,7 @@ class Vocabulary(object):
 
 		self.micWindows = []
 		self.proxWindows = []
+		self.labels = []
 		self.windowIds = {}
 
 	def __len__(self):
@@ -39,7 +40,9 @@ def build_vocab(data_path, win_len):
 			for i in range(len(mic) - win_len + 1):
 				vocab.micWindows.append(mic[i:i+win_len])
 				vocab.proxWindows.append(prox[i:i+win_len])
+				vocab.labels.append(cat)
 				vocab.windowIds[len(vocab.micWindows)-1] = cat
+	return vocab
 
 
 def main(args):
