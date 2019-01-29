@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import argparse
 
 from sklearn.model_selection import train_test_split
@@ -13,10 +14,13 @@ def main(args):
 		'raw_mic':vocab.micWindows,
 		'raw_prox':vocab.proxWindows,
 	})
+	diff = [1, -1]
+	tmp = [np.convolve(diff, x, 'full') for x in vocab.proxWindows]
+
 	mic = pd.DataFrame(data['raw_mic'].values.tolist())
 	prox = pd.DataFrame(data['raw_prox'].values.tolist())
-	X = pd.concat([prox,mic], axis=1)
-	# print X.head() 
+	conv = pd.DataFrame(tmp)
+	X = pd.concat([prox, mic, conv], axis=1)
 
 	y = data['label']
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
@@ -30,6 +34,6 @@ if __name__ == '__main__':
 	parser.add_argument('--data_path', type=str,
 		default='data/', help='path to data files')
 	parser.add_argument('--win_len', type=int,
-		default=5, help='length of the window to process')
+		default=20, help='length of the window to process')
 	args = parser.parse_args()
 	main(args)
