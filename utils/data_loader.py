@@ -26,9 +26,12 @@ def build_vocab(data_path, win_len):
 				print 'processing:', data_path + cat + '/' + filename
 				vals = file.read()
 				vals = vals[:-2] # remove the new line character at end of file
-				vals = vals.split('\r\n')
-				vals.pop(0)
-				vals.pop(0)
+				if '\r' in vals:
+					vals = vals.split('\r\n')
+					vals.pop(0)
+					vals.pop(0)
+				else:
+					vals = vals.split('\n')
 				for val in vals:
 					d = val.split(',')
 					if len(d) != 2 or (len(d) >= 2 and 'TIMEOUT' in d[1])\
