@@ -7,6 +7,7 @@ import utils.config as config
 from sklearn.model_selection import train_test_split
 from utils.data_loader import build_vocab, Vocabulary
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
 from sklearn import metrics
 
 def main(args):
@@ -23,15 +24,29 @@ def main(args):
 	prox = pd.DataFrame(data['raw_prox'].values.tolist())
 	conv = pd.DataFrame(tmp)
 	X = pd.concat([prox, mic, conv], axis=1)
-
 	y = data['label']
 	X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+	param_grid = {
+		'bootstrap': [True],
+		'max_depth': [80, 90, 100, 110],
+		'max_features': [2, 3],
+		'min_samples_leaf': [3, 4, 5],
+		'min_samples_split': [8, 10, 12],
+		'n_estimators': [100, 200, 300, 1000]
+	}
 	clf = RandomForestClassifier(n_estimators=100)
-	clf.fit(X_train, y_train)
-	y_pred = clf.predict(X_test)
-	print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
-	pickle.dump(clf, open('models/' + args.output, 'wb'))
-	print("saved to:",'models/' + args.output)
+	grid_search = GridSearchCV(estimator=clf, param_grid=param_grid, cv=3, n_jobs=-1, verbose=2)
+	grid_search.fit(X_train, y_train)
+	grid_search.best_params_
+	best_grid = grid_search.best_estimator_
+	grid_accuracy = evaluate(best_grid, X_test, y_test)
+
+	# clf.fit(X_train, y_train)
+	# y_pred = clf.predict(X_test)
+	# print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+	# pickle.dump(clf, open('models/' + args.output, 'wb'))
+	# print("saved to:",'models/' + args.output)
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
