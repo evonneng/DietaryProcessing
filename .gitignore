@@ -1,4 +1,4 @@
 *.pyc
 env/
-data/
-models/
+arduino/data/
+arduino/models/
