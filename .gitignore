@@ -2,3 +2,4 @@
 env/
 arduino/data/
 arduino/models/
+raspi/tensor/models/
